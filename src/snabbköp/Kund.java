@@ -1,4 +1,4 @@
-package snabbköp.händelser.övrigt;
+package snabbköp;
 
 
 /**

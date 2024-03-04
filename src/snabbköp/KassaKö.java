@@ -2,7 +2,6 @@ package snabbköp;
 
 import java.util.ArrayList;
 import java.util.List;
-import snabbköp.händelser.övrigt.Kund;
 
 /**
  * Kassakön för snabbköpet somo fungerar som en fifo.

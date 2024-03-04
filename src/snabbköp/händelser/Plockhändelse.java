@@ -2,8 +2,8 @@ package snabbköp.händelser;
 
 import generellSim.Event;
 import generellSim.EventQueue;
+import snabbköp.Kund;
 import snabbköp.SnabbköpTillstånd;
-import snabbköp.händelser.övrigt.Kund;
 
 /**
  * Hanterar händelsen då en kund plockar sina varor i snabbköpssimuleringen.
