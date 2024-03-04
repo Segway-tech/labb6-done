@@ -2,8 +2,8 @@ package snabbköp.händelser;
 
 import generellSim.Event;
 import generellSim.EventQueue;
+import snabbköp.Kund;
 import snabbköp.SnabbköpTillstånd;
-import snabbköp.händelser.övrigt.Kund;
 
 /**
  * Ankomsthändelse i snabbköpssimuleringen. Denna händelse skapar en ny kund
@@ -44,8 +44,7 @@ public class Ankomsthändelse extends Event implements KundHändelse{
      */
     public void executeEvent() {    	
     	if (this.tillstånd.ärSnabbköpÖppet()) { //Kollar om snabbköpet är öppet
-    		//this.tillstånd.ökaTotaltAntalKunderSomFörsöktHandlat();
-    		 //Skapa en ankomsttid för nästa kunbd
+    		 //Skapa en ankomsttid för nästa kund
             double nästaAnkomstTid = this.tillstånd.getNästaAnkomstTid(this.getTimeOfEvent()); 
             this.eQ.addEvent(new Ankomsthändelse(this.tillstånd, this.eQ, nästaAnkomstTid, this.tillstånd.skapaKund()));
             if (this.tillstånd.getAntalKunderISnabbköpet() < this.tillstånd.getMaxAntalKunder()) { //Kollar om snabbköpet är fullt

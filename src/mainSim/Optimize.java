@@ -43,17 +43,17 @@ public class Optimize {
      * @return Det optimala antalet kassor för att minimera antalet missade kunder.
      */
     public int metod2RaiseOne(long frö){
-        int maxAntalKunder = 7; // Max antal kunder som kan vara i snabbköpet samtidigt
+        int maxAntalKunder = 5; // Max antal kunder som kan vara i snabbköpet samtidigt
         double stängSnabbköp = 10.0;
         double maxPlockTid = 1.0;
         double minPlockTid = 0.5;
         double maxKassaTid = 3;
         double minKassaTid = 2;
-        double ankomstRate = 2.0;
+        double ankomstRate = 1.0;
 
         int antalKassor = maxAntalKunder;
         int maxMissadeKunder = metod1(antalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, stängSnabbköp); // Antalet missade kunder när man kör metod1 med givna parametrar
-
+        
         while(antalKassor >= 1) { //Antalet kassor kan vara minst 1, while-loop börjar från högsta antalet kassor och minskar med ett.
             int nyaAntalMissadeKunder = metod1(antalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, stängSnabbköp); // Kör metod1 med nya antalet kassor
             if (maxMissadeKunder != nyaAntalMissadeKunder){ // När vi når till maxMissadeKunder avbryter programmet
@@ -64,33 +64,6 @@ public class Optimize {
         }
         return antalKassor;
     }
-
-/*
-    public int metod2RaiseHalf(int maxAntalKunder, double ankomstRate, long frö, double minKassaTid, double maxKassaTid, double minPlockTid, double maxPlockTid, double tidenSnabbköpetStänger) {
-        int low = 1;
-        int high = maxAntalKunder; // Set a large upper bound for the number of cash registers
-        int result = 0;
-
-        while (low < high) {
-            int mid = (high - low) / 2;
-            // Calculate missed customers for mid kassor
-            int missed = metod1(mid, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger); //3 2
-
-
-            // If missed customers is 0, return mid
-            if (missed == 0) {
-                result = mid;
-                high = mid - 1;
-            } else {
-                result = mid;
-                // If missed customers is not 0, adjust high
-                low = mid + 1;
-            }
-        }
-        // Return the lowest number of kassor that results in 0 missed customers
-        return result; // testa sista gången med mid - 1
-    }
-*/
 
     /**
      * Beräknar det optimala antalet kassor för att minimera antalet missade kunder genom att iterativt öka antalet kassor.
