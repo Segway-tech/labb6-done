@@ -4,6 +4,7 @@ import snabbköp.SnabbköpSim;
 import snabbköp.SnabbköpTillstånd;
 import snabbköp.händelser.Starthändelse;
 import snabbköp.händelser.Stophändelse;
+import randomNum.K;
 
 import java.util.Random;
 
@@ -42,20 +43,12 @@ public class Optimize {
      * @param frö Frö för slumpgeneratorn.
      * @return Det optimala antalet kassor för att minimera antalet missade kunder.
      */
-    public int metod2RaiseOne(long frö){
-        int maxAntalKunder = 5; // Max antal kunder som kan vara i snabbköpet samtidigt
-        double stängSnabbköp = 10.0;
-        double maxPlockTid = 1.0;
-        double minPlockTid = 0.5;
-        double maxKassaTid = 3;
-        double minKassaTid = 2;
-        double ankomstRate = 1.0;
-
+    public int metod2RaiseOne(int maxAntalKunder, double ankomstRate, long frö, double minKassaTid, double maxKassaTid, double minPlockTid, double maxPlockTid, double tidenSnabbköpetStänger){
         int antalKassor = maxAntalKunder;
-        int maxMissadeKunder = metod1(antalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, stängSnabbköp); // Antalet missade kunder när man kör metod1 med givna parametrar
+        int maxMissadeKunder = metod1(antalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger); // Antalet missade kunder när man kör metod1 med givna parametrar
         
         while(antalKassor >= 1) { //Antalet kassor kan vara minst 1, while-loop börjar från högsta antalet kassor och minskar med ett.
-            int nyaAntalMissadeKunder = metod1(antalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, stängSnabbköp); // Kör metod1 med nya antalet kassor
+            int nyaAntalMissadeKunder = metod1(antalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger); // Kör metod1 med nya antalet kassor
             if (maxMissadeKunder != nyaAntalMissadeKunder){ // När vi når till maxMissadeKunder avbryter programmet
                 return antalKassor+1;
             }
@@ -63,6 +56,26 @@ public class Optimize {
 
         }
         return antalKassor;
+    }
+
+    public int binarySearchMetod(int maxAntalKunder, double ankomstRate, long frö, double minKassaTid, double maxKassaTid, double minPlockTid, double maxPlockTid, double tidenSnabbköpetStänger) {
+        int maxAntalKassor = 1;
+        int minAntalKassor = maxAntalKunder;
+        int result = -1;
+        int oldMissedCustomers = metod1(minAntalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger);
+
+        while (maxAntalKassor <= minAntalKassor) {
+            int optimalAntalKassor = maxAntalKassor + (minAntalKassor - maxAntalKassor) / 2;
+            int currentMissedCustomers = metod1(optimalAntalKassor, maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger);
+            if (currentMissedCustomers <= 0 || (currentMissedCustomers == oldMissedCustomers)) {
+                result = optimalAntalKassor;
+                minAntalKassor = optimalAntalKassor - 1;
+            } else {
+                maxAntalKassor = optimalAntalKassor + 1;
+            }
+            oldMissedCustomers = currentMissedCustomers;
+        }
+        return result;
     }
 
     /**
@@ -73,13 +86,13 @@ public class Optimize {
      * @return Det optimala antalet kassor för att minimera antalet missade kunder.
      */
 
-    public int metod3(long frö){
+    public int metod3(int maxAntalKunder, double ankomstRate, long frö, double minKassaTid, double maxKassaTid, double minPlockTid, double maxPlockTid, double tidenSnabbköpetStänger){
         Random rand = new Random(frö);
         int counter = 0;
         int antalKassor = 0; // minsta antalet kassor som behövs för att få 0 missade kunder
 
         while(counter < 100){
-            int nyAntalKassor = metod2RaiseOne(rand.nextLong()); //10
+            int nyAntalKassor = metod2RaiseOne(maxAntalKunder, ankomstRate, rand.nextLong(), minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger); //10
             if(antalKassor != Math.max(antalKassor, nyAntalKassor)){ // Kollar om gamla antalet kassor lika stort eller störra än nyaAntaletKassor: öka counter
                 counter = 0;
             }
@@ -95,11 +108,12 @@ public class Optimize {
 
     public static void main(String[] args) {
         Optimize optimize = new Optimize();
-        int metod2 = optimize.metod2RaiseOne(1234L);
+        //maxAntalKunder, ankomstRate, frö, minKassaTid, maxKassaTid, minPlockTid, maxPlockTid, tidenSnabbköpetStänger
+        int metod2 = optimize.binarySearchMetod(K.M, K.L, K.SEED, K.LOW_PAYMENT_TIME, K.HIGH_PAYMENT_TIME, K.LOW_COLLECTION_TIME, K.HIGH_COLLECTION_TIME, K.END_TIME);
         System.out.println("Metod2: " + metod2 + " kassor behövs för att få minsta antal missade kunder");
-        int metod1 = optimize.metod1(metod2,7, 2.0, 1234L, 2, 3, 0.5, 1, 10.0);
+        int metod1 = optimize.metod1(metod2,K.M, K.L, K.SEED, K.LOW_PAYMENT_TIME, K.HIGH_PAYMENT_TIME, K.LOW_COLLECTION_TIME, K.HIGH_COLLECTION_TIME, K.END_TIME);
         System.out.println(String.format("Metod1 with Metod2 (%d) as an argument: %d missade kunder", metod2,metod1));
-        int m3 = optimize.metod3(13);
+        int m3 = optimize.metod3(K.M, K.L, K.SEED, K.LOW_PAYMENT_TIME, K.HIGH_PAYMENT_TIME, K.LOW_COLLECTION_TIME, K.HIGH_COLLECTION_TIME, K.END_TIME);
         System.out.println("Metod3: " + m3);
     }
 
